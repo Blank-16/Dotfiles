@@ -145,6 +145,7 @@ keymap("n", "<leader>w", ":w<CR>", { desc = "Save File" })
 keymap("n", "<leader>q", ":q<CR>", { desc = "Quit" })
 keymap("n", "<leader>h", ":noh<CR>", { desc = "Clear Highlight" })
 keymap("n", "<leader>e", ":Lexplore<CR>", { desc = "File Explorer" }) -- Changed to 'e' to free up 'f' for Find
+keymap("n", "<leader>v", ":vsplit<CR>", { desc = "V-Split" }) 
 
 -- Window Nav
 keymap("n", "<C-h>", "<C-w>h")
