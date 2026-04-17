@@ -1,10 +1,14 @@
--- vim config 
+local site_path = vim.fn.expand("$HOME/.local/share/nvim/site")
+vim.opt.runtimepath:prepend(site_path)
 
--- OLED Black Universal Neovim 
-
-vim.opt.runtimepath:append("/home/blank/.local/share/nvim/site")
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
+
+-- Disable heavy providers for faster WSL startup
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
 
 -- --- 1. BOOTSTRAP LAZY.NVIM ---
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -18,7 +22,29 @@ vim.opt.rtp:prepend(lazypath)
 
 -- --- 2. PLUGIN LIST & CONFIG ---
 require("lazy").setup({
-  "sainnhe/gruvbox-material",
+  -- THEME: Catppuccin
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 1000,
+    opts = {
+      flavour = "mocha", -- Darkest version
+      transparent_background = false, -- We handle this with our OLED logic
+      integrations = {
+        telescope = { enabled = true },
+        treesitter = true,
+        which_key = true,
+        gitgutter = true,
+      }
+    }
+  },
+
+  -- MULTI-CURSOR SUPPORT
+  {
+    'mg979/vim-visual-multi',
+    branch = 'master',
+  },
+
   "airblade/vim-gitgutter",
   "tpope/vim-commentary",
   "jiangmiao/auto-pairs",
@@ -34,13 +60,12 @@ require("lazy").setup({
     opts = { preset = "modern", win = { border = "single", padding = { 1, 2 } } },
   },
 
-  -- TELESCOPE: The Fuzzy Finder
+  -- TELESCOPE
   {
     "nvim-telescope/telescope.nvim",
-    branch = "0.1.x",
+    branch = "master",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      -- High-speed C sorter (only loads if 'make' is available)
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "make",
@@ -76,8 +101,6 @@ require("lazy").setup({
           "go", "javascript", "typescript",
           "dockerfile", "yaml", "json", "markdown", "html"
         },
-        sync_install = false,
-        auto_install = false,
         highlight = {
           enable = true,
           additional_vim_regex_highlighting = false,
@@ -106,11 +129,8 @@ opt.splitbelow = true
 opt.splitright = true
 opt.mouse = 'a'
 
-vim.g.loaded_python3_provider = 0
-vim.g.loaded_ruby_provider = 0
-vim.g.loaded_perl_provider = 0
-
 -- --- 4. OLED BLACK LOGIC ---
+-- This forces the background to #000000 regardless of the theme
 vim.api.nvim_create_autocmd("ColorScheme", {
     pattern = "*",
     callback = function()
@@ -124,48 +144,40 @@ vim.api.nvim_create_autocmd("ColorScheme", {
         hl(0, "GitGutterAdd",    { fg = "#b8bb26", bg = "#000000" })
         hl(0, "GitGutterChange", { fg = "#fabd2f", bg = "#000000" })
         hl(0, "GitGutterDelete", { fg = "#fb4934", bg = "#000000" })
-        -- Telescope OLED overrides
-        hl(0, "TelescopeNormal",        { bg = "#000000" })
-        hl(0, "TelescopeBorder",        { bg = "#000000", fg = "#504945" })
-        hl(0, "TelescopePromptNormal",  { bg = "#000000" })
-        hl(0, "TelescopePromptBorder",  { bg = "#000000", fg = "#504945" })
+        -- Telescope
+        hl(0, "TelescopeNormal",       { bg = "#000000" })
+        hl(0, "TelescopeBorder",       { bg = "#000000", fg = "#504945" })
+        hl(0, "TelescopePromptNormal", { bg = "#000000" })
+        hl(0, "TelescopePromptBorder", { bg = "#000000", fg = "#504945" })
     end,
 })
 
--- --- 5. SAFE THEME LOADING ---
-vim.g.gruvbox_material_background = 'hard'
-local theme_ok, _ = pcall(vim.cmd, 'colorscheme gruvbox-material')
-if not theme_ok then vim.cmd('colorscheme default') end
+-- --- 5. LOAD THEME ---
+vim.cmd.colorscheme("catppuccin")
 
--- --- 6. COMPONENT SETTINGS ---
-vim.g.gitgutter_sign_added    = '▎'
-vim.g.gitgutter_sign_modified = '▎'
-vim.g.gitgutter_sign_removed  = ''
-vim.g.netrw_banner   = 0
-vim.g.netrw_liststyle = 3
-vim.g.netrw_winsize  = 25
-
--- --- 7. KEYBINDINGS ---
+-- --- 6. KEYBINDINGS ---
 local keymap = vim.keymap.set
 
 -- Standard operations
 keymap("n", "<leader>w", ":w<CR>",       { desc = "Save File" })
 keymap("n", "<leader>q", ":q<CR>",       { desc = "Quit" })
-keymap("n", "<leader>h", ":noh<CR>",     { desc = "Clear Highlight" })
+keymap("n", "<leader>h", ":nohlsearch<CR>", { desc = "Clear Highlight" })
 keymap("n", "<leader>e", ":Lexplore<CR>",{ desc = "File Explorer" })
 keymap("n", "<leader>v", ":vsplit<CR>",  { desc = "V-Split" })
+-- Multi-cursor manual trigger (If Ctrl+V fails in Windows)
+keymap("n", "vv", "<C-v>", { desc = "Visual Block Mode" })
 
--- Window Nav
+-- Window Navigation
 keymap("n", "<C-h>", "<C-w>h")
 keymap("n", "<C-j>", "<C-w>j")
 keymap("n", "<C-k>", "<C-w>k")
 keymap("n", "<C-l>", "<C-w>l")
 
--- TELESCOPE BINDINGS
+-- Telescope
 local builtin_ok, builtin = pcall(require, "telescope.builtin")
 if builtin_ok then
   keymap('n', '<leader>ff', builtin.find_files, { desc = 'Find Files' })
-  keymap('n', '<leader>fg', builtin.live_grep,  { desc = 'Live Grep (Search Code)' })
-  keymap('n', '<leader>fb', builtin.buffers,    { desc = 'Find Open Buffers' })
-  keymap('n', '<leader>fh', builtin.help_tags,  { desc = 'Find Help' })
+  keymap('n', '<leader>fg', builtin.live_grep,  { desc = 'Search Code' })
+  keymap('n', '<leader>fb', builtin.buffers,    { desc = 'Open Buffers' })
+  keymap('n', '<leader>fh', builtin.help_tags,  { desc = 'Help' })
 end
