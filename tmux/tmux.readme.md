@@ -1,5 +1,3 @@
-In `tmux`, the **Leader Key** (formally called the **Prefix**) is the key combination you must press *before* any other command. It tells `tmux` to listen for a shortcut instead of passing the input to the terminal.
-
 ### The Leader Key
 In the configuration provided, the leader key is **`Ctrl + a`** (written as `C-a`). 
 
