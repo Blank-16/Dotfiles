@@ -1,3 +1,5 @@
+-- Install location: ~/.config/nvim/init.lua
+
 local site_path = vim.fn.expand("$HOME/.local/share/nvim/site")
 vim.opt.runtimepath:prepend(site_path)
 

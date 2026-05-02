@@ -1,3 +1,5 @@
+# Install location: ~/.zshrc
+
 # zshrc config file 
 
 # --- 1. Framework & Theme ---
