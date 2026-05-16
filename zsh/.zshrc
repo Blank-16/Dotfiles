@@ -1,5 +1,4 @@
 # Install location: ~/.zshrc
-
 # zshrc config file 
 
 # --- 1. Framework & Theme ---
@@ -29,16 +28,25 @@ alias v='nvim'
 alias vf='nvim .'
 alias edv='nvim ~/.config/nvim/init.lua'
 alias edz='nvim ~/.zshrc'
-alias src='source ~/.zshrc'
+alias updateSys='sudo apt update && sudo apt upgrade'
 
-# Docker Aliases
-alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
-alias dcu='docker-compose up -d'
-alias dcd='docker-compose down'
-alias cls='clear'
+# git aliases
+alias gitc='git commit -m'
+alias gitLog='git log | v'
+alias gitlog='git log --oneline --graph --all --decorate'
+alias gita='git add .'
+alias gits='git status'
 
 # --- 6. Completion Tuning ---
 zstyle ':completion:*' menu select
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+. "$HOME/.local/bin/env"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:$HOME/go/bin
